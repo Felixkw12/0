@@ -62,6 +62,7 @@ const CATALOG_PROVIDER_IDS: Readonly<Record<string, string>> = {
 };
 export const METERED_CATALOG_PROVIDERS: Readonly<Record<string, true>> = {
   anthropic: true, openai: true, deepseek: true, openrouter: true, xai: true, opencode: true, cline: true,
+  opper: true,
 };
 
 function catalogId(value: unknown): value is string {

@@ -208,7 +208,7 @@ function azureDeploymentPriceKey(model: string): string | null {
 const MODEL_VENDOR_PREFIXES = [
   "openai/", "azure/", "anthropic/", "google/", "deepseek/", "meta/", "mistral/",
   "z-ai/", "zai/", "kimi/", "moonshot/", "qwen/", "openrouter/", "opencode/",
-  "xai/", "x-ai/", "cline/", "cline-pass/",
+  "xai/", "x-ai/", "cline/", "cline-pass/", "opper/",
 ];
 
 function normalizeModel(model: string): string {
@@ -273,6 +273,7 @@ export function modelProvider(model?: string): string {
   if (lowered.startsWith("kimi/") || lowered.startsWith("moonshot/")) return "kimi";
   if (lowered.startsWith("openrouter/")) return "openrouter";
   if (lowered.startsWith("opencode/")) return "opencode";
+  if (lowered.startsWith("opper/")) return "opper";
   if (lowered.startsWith("copilot/")) return "copilot";
   if (lowered.startsWith("xai/") || lowered.startsWith("x-ai/")) return "xai";
 

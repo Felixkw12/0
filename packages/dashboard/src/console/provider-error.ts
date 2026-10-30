@@ -10,6 +10,6 @@ export function consoleErrorMessage(message: string): string {
   if (needsModelSourceReconnect(message)) return "This chat lost its connection to your local model source. Reconnect it, then retry your message.";
   if (!needsProviderSignIn(message)) return message;
   if (/Codex|ChatGPT/i.test(message)) return "Your ChatGPT connection needs attention. Sign in again in Connections, then retry your message.";
-  const provider = /DeepSeek|Anthropic|OpenAI|OpenRouter|Gemini|Google|Cline/i.exec(message)?.[0];
+  const provider = /DeepSeek|Anthropic|OpenAI|OpenRouter|Gemini|Google|Cline|Opper/i.exec(message)?.[0];
   return `Your ${provider ? `${provider} ` : ""}connection needs attention. Update the connection in Settings, then retry your message.`;
 }

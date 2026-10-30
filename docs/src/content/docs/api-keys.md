@@ -23,6 +23,7 @@ provide model inference to the local console.
 | **xAI Grok** | `XAI_API_KEY` | `grok-4.6` | Chat completions by default; optional Responses |
 | **OpenCode Zen** | `OPENCODE_API_KEY` | `muse-spark-1.3-contributor-free` | Per-model (Responses, Anthropic Messages, Google generateContent, or Chat completions) |
 | **Cline / ClinePass** | `CLINE_API_KEY` | `anthropic/claude-sonnet-4-6` (usage billed); select a `cline-pass/*` ID for Pass | Chat completions |
+| **Opper** | `OPPER_API_KEY` | `claude-sonnet-4-6` | Chat completions |
 | **GitHub Copilot** | `ZERO_COPILOT_GITHUB_TOKEN` | `gpt-4o` | Chat completions (device sign-in) |
 | **Google Gemini Code Assist** | `ZERO_GEMINI_ACCESS_TOKEN` / `ZERO_GEMINI_OAUTH_REFRESH_TOKEN` | `gemini-2.5-pro` | Code Assist generateContent (browser sign-in) |
 | **Anthropic** | `ANTHROPIC_API_KEY` | `claude-sonnet-4-6` | Anthropic Messages |
@@ -141,6 +142,26 @@ estimates use the ≤256K input tier.
 See Cline's official [authentication guide](https://github.com/cline/cline/blob/main/docs/api/authentication.mdx)
 and [ClinePass guide](https://github.com/cline/cline/blob/main/docs/getting-started/clinepass.mdx).
 
+## Opper
+
+Create an API key at **platform.opper.ai → API Keys**, then connect **Opper**
+in Connections or export `OPPER_API_KEY`. Inference uses
+`https://api.opper.ai/v3/compat`; `OPPER_BASE_URL` changes the endpoint.
+
+A bare model ID such as `claude-sonnet-4-6`, `gpt-6.1-terra` or
+`gemini-3.8-flash` lets Opper choose the route. A `vendor/model` ID such as
+`anthropic/claude-sonnet-4-6` pins one. `opper/<model-id>` selects the Opper
+connection when several keys are present; the prefix is stripped before the request.
+
+```bash
+export OPPER_API_KEY="..."
+env ZERO_SELECTED_PROVIDER=opper ZERO_MODEL=claude-sonnet-4-6 \
+  0 review ./authorized-repo --runtime api
+```
+
+The model picker lists the models your key can call from the connection's
+`/models` endpoint. See the [Opper docs](https://docs.opper.ai/build/gateway/drop-in-sdks).
+
 ## Credential priority
 
 Within the API runtime, when there is no provider pin or model-to-provider match,
@@ -158,9 +179,10 @@ the following ambient credential order applies. `--model` takes precedence over
 9. **xAI Grok** — `XAI_API_KEY`
 10. **OpenCode Zen** — `OPENCODE_API_KEY`
 11. **Cline** — `CLINE_API_KEY`
-12. **GitHub Copilot** — `ZERO_COPILOT_GITHUB_TOKEN`
-13. **Google Gemini Code Assist** — `ZERO_GEMINI_ACCESS_TOKEN` or `ZERO_GEMINI_OAUTH_REFRESH_TOKEN`
-14. **Anthropic** — `ANTHROPIC_API_KEY`
+12. **Opper** — `OPPER_API_KEY`
+13. **GitHub Copilot** — `ZERO_COPILOT_GITHUB_TOKEN`
+14. **Google Gemini Code Assist** — `ZERO_GEMINI_ACCESS_TOKEN` or `ZERO_GEMINI_OAUTH_REFRESH_TOKEN`
+15. **Anthropic** — `ANTHROPIC_API_KEY`
 
 Without a usable provider credential, the runtime reports a missing-credential
 failure. Saved Cloud credentials do not become a model provider.
@@ -196,6 +218,7 @@ when more than one credential is present.
 | `muse-spark*`, `mimo*`, `ling*`, `big-pickle`, `nemotron*`, `minimax*` | OpenCode Zen | Muse uses Responses; the other listed families use Chat Completions |
 | `cline/<provider>/<model-id>` | Cline API | Strip only `cline/`; keep the vendor/model slug |
 | `cline-pass/*` | Cline API | Preserve the full slug; active ClinePass subscription required |
+| `opper/<model-id>` | Opper | Prefix stripped; bare IDs and `vendor/model` pins are both accepted |
 | `copilot/*` | GitHub Copilot | Prefix stripped; independently authenticated connection |
 | `gemini*`, `google/*` | Google Gemini Code Assist | Requires Google OAuth; not the public Gemini API-key route |
 | `claude*`, `anthropic/*`, IDs containing `sonnet`, `opus`, `haiku` | Anthropic, then OpenRouter | OpenRouter fallback requires its key |
@@ -237,7 +260,7 @@ env OPENROUTER_API_KEY="sk-or-v1-..." ZERO_SELECTED_PROVIDER=openrouter \
 `ZERO_SELECTED_PROVIDER` selects the primary provider, bypassing ambient
 credential priority. It accepts `openrouter`, `anthropic`, `openai`, `azure`,
 `deepseek`, `chatgpt-codex`, `z-ai`, `kimi`, `qwen`, `xai`, `opencode`,
-`copilot` and `google`.
+`opper`, `copilot` and `google`.
 
 Set `ZERO_MODEL` alongside an environment provider selection. A separately
 configured explicit model can use another route, for example a cross-model
@@ -409,7 +432,7 @@ Each entry is `<providerId>:<model>`, comma-separated. The runtime advances
 through eligible routes sequentially and skips entries without the required
 credentials. Supported IDs are `openrouter`, `anthropic`, `openai`, `azure`,
 `deepseek`, `chatgpt-codex`, `z-ai`, `kimi`, `qwen`, `xai`, `opencode`,
-`copilot` and `google`.
+`opper`, `copilot` and `google`.
 
 ## Azure OpenAI configuration
 

@@ -79,7 +79,7 @@ export function crossFamilyRefuteEnabled(): boolean {
  */
 export function refuterFamily(model?: string): string {
   if (!model) return "unknown";
-  const unwrapped = model.toLowerCase().startsWith("openrouter/") ? model.slice("openrouter/".length) : model;
+  const unwrapped = model.replace(/^(?:openrouter|opper)\//i, "");
   return modelProvider(unwrapped);
 }
 
@@ -103,7 +103,7 @@ export function refuterFamily(model?: string): string {
  *   - openrouter — a meta-router; the key alone does not say which family you
  *     get. Operators who want it can name explicit `openrouter/<vendor>/<model>`
  *     ids via ZERO_HUNT_REFUTER_CANDIDATES, which {@link refuterFamily}
- *     classifies correctly.
+ *     classifies correctly. The same applies to Opper (`opper/<model>`).
  *   - AZURE_OPENAI_API_KEY — same family as OpenAI (so it buys no
  *     decorrelation against a GPT finder), and Azure addresses models by
  *     account-specific DEPLOYMENT name, which we cannot guess. Operators with

@@ -175,6 +175,13 @@ const PROVIDER_DEFS: readonly Omit<ProviderInfo, "auth">[] = [
     hint: "set OPENCODE_API_KEY from opencode.ai/auth (endpoint override: OPENCODE_BASE_URL)",
   },
   {
+    id: "opper",
+    label: "Opper",
+    methods: ["api-key"],
+    envVars: ["OPPER_API_KEY"],
+    hint: "set OPPER_API_KEY from platform.opper.ai API Keys (endpoint override: OPPER_BASE_URL)",
+  },
+  {
     id: "copilot",
     label: "GitHub Copilot",
     // OAuth only (device-code sign-in). The GitHub device-flow access token is

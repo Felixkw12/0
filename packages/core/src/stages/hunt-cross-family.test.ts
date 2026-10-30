@@ -183,6 +183,18 @@ describe("refuterFamily", () => {
     expect(choice.crossFamily).toBe(false);
     expect(choice.status).toBe("no-distinct-family");
   });
+
+  it("unwraps the opper/ routing prefix the same way", () => {
+    expect(refuterFamily("opper/claude-sonnet-4-6")).toBe("anthropic");
+    expect(refuterFamily("opper/gpt-6.1-terra")).toBe("openai");
+    const choice = selectCrossFamilyRefuter({
+      enabled: true,
+      finderModel: "claude-opus-4-7",
+      candidates: ["opper/claude-sonnet-4-6"],
+    });
+    expect(choice.crossFamily).toBe(false);
+    expect(choice.status).toBe("no-distinct-family");
+  });
 });
 
 describe("availableRefuterCandidates", () => {

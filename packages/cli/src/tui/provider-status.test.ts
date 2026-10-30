@@ -100,6 +100,7 @@ describe("PROVIDERS", () => {
         "openai",
         "opencode",
         "openrouter",
+        "opper",
         "qwen",
         "xai",
         "z-ai",

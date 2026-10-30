@@ -59,6 +59,8 @@ describe("LlmApiRuntime provider detection", () => {
     delete process.env.XAI_BASE_URL;
     delete process.env.OPENCODE_API_KEY;
     delete process.env.OPENCODE_BASE_URL;
+    delete process.env.OPPER_API_KEY;
+    delete process.env.OPPER_BASE_URL;
     delete process.env["ZERO_MODEL"];
     delete process.env["ZERO_SELECTED_PROVIDER"];
     delete process.env["ZERO_FORCE_PROVIDER"];
@@ -638,6 +640,29 @@ describe("LlmApiRuntime provider detection", () => {
     const spark = new LlmApiRuntime({ type: "api", timeout: 5000, model: "muse-spark-1.3-contributor-free" });
     expect((spark as any).provider).toBe("opencode");
     expect((spark as any).wireApi).toBe("responses");
+    const claude = new LlmApiRuntime({ type: "api", timeout: 5000, model: "claude-sonnet-4-6" });
+    expect((claude as any).provider).toBe("anthropic");
+  });
+
+  it("places Opper ahead of the Anthropic final fallback on the chat/completions wire", () => {
+    // Opper joins the explicit opt-ins tried BEFORE Anthropic. A bare run
+    // resolves to Opper, an `opper/` pick routes to Opper with the prefix
+    // stripped, and a bare claude pick still routes per-call to Anthropic.
+    // foxguard: ignore[js/no-hardcoded-secret]
+    process.env.ANTHROPIC_API_KEY = "sk-ant-test";
+    // foxguard: ignore[js/no-hardcoded-secret]
+    process.env.OPPER_API_KEY = "opper-test";
+    const bare = new LlmApiRuntime({ type: "api", timeout: 5000 });
+    expect((bare as any).provider).toBe("opper");
+    expect((bare as any).model).toBe("claude-sonnet-4-6");
+    expect((bare as any).baseUrl).toBe("https://api.opper.ai/v3/compat");
+    expect((bare as any).wireApi).toBe("chat_completions");
+    expect((bare as any).buildHeaders()["Authorization"]).toBe("Bearer opper-test");
+    expect((bare as any).buildUrl()).toBe("https://api.opper.ai/v3/compat/chat/completions");
+    const prefixed = new LlmApiRuntime({ type: "api", timeout: 5000, model: "opper/gpt-6.1-terra" });
+    expect((prefixed as any).provider).toBe("opper");
+    expect((prefixed as any).model).toBe("gpt-6.1-terra");
+    expect((prefixed as any).wireApi).toBe("chat_completions");
     const claude = new LlmApiRuntime({ type: "api", timeout: 5000, model: "claude-sonnet-4-6" });
     expect((claude as any).provider).toBe("anthropic");
   });
